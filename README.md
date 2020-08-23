@@ -1,8 +1,7 @@
-# Tadpole algorithms
+# data folder with the TADPOLE CSVs and preprocessed models and forecasted values by the models
+## instructions to use:
+- download the data folder:
+https://www.dropbox.com/sh/ybyaf5m1p8cnio5/AAANu5S_qc53ZtK_2s_yVE8ra?dl=0
 
-If you would like to use the algorithms, install this library using pip:
-
-- `pip install git+https://github.com/tadpole-share/tadpole-algorithms`
-
-See [https://github.com/tadpole-share/jupyter](https://github.com/tadpole-share/jupyter) for example Jupyter notebooks.
-
+- place it in the root directory of the repository so the ptyhon and R code can load or write the data
+- run 
