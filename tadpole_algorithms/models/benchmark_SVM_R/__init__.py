@@ -65,17 +65,19 @@ class BenchmarkSVM_R(TadpoleModel):
         tidy_dataframe = robjects.r(tadpole_tidying_script)  
         return tidy_dataframe
 
-            
-    def preproc_tadpole_D1_D2(self,Tadpole_D1_D2,usePreProc=1):
-        preproc_tadpole_D1_D2_RSCRIPT = ""
-        #Tadpole_D1_D2.to_csv("data/temp/train_df.csv")        
-        with open('R_scripts/preproc_tadpole_D1_D2.txt', 'r') as file: 
-            preproc_tadpole_D1_D2_RSCRIPT = file.read()
-        #replace the values on the script with the actual atributes needed (its like pasing arguments in a function)   
-        preproc_tadpole_D1_D2_RSCRIPT = preproc_tadpole_D1_D2_RSCRIPT.replace("_preTrain_",str(usePreProc))
+##################################### final functions   
+    def preproc_tadpole_D1_D2(self,Tadpole_D1_D2,usePreProc=True):
+        #using the usePreProc flag you can select between use the preprocess model results or not
+        if usePreProc == False:
+            preproc_tadpole_D1_D2_RSCRIPT = ""
+            Tadpole_D1_D2.to_csv("data/temp/train_df.csv")        
+            with open('R_scripts/preproc_tadpole_D1_D2.r', 'r') as file: 
+                preproc_tadpole_D1_D2_RSCRIPT = file.read()
+            #replace the values on the script with the actual atributes needed (its like pasing arguments in a function)   
+            #preproc_tadpole_D1_D2_RSCRIPT = preproc_tadpole_D1_D2_RSCRIPT.replace("_preTrain_",str(usePreProc))
+            preproc_tadpole_D1_D2_RFUNC = robjects.r(preproc_tadpole_D1_D2_RSCRIPT)
+            #load the result of preprocesing of Tadpole_d1_d2
 
-        preproc_tadpole_D1_D2_RFUNC = robjects.r(preproc_tadpole_D1_D2_RSCRIPT)
-        #load the result of preprocesing of Tadpole_d1_d2
         AdjustedTrainFrame = pd.read_csv("data/temp/dataTadpole$AdjustedTrainFrame.csv")
         testingFrame = pd.read_csv("data/temp/dataTadpole$testingFrame.csv")
         Train_Imputed = pd.read_csv("data/temp/dataTadpole$Train_Imputed.csv")
@@ -83,42 +85,46 @@ class BenchmarkSVM_R(TadpoleModel):
 
         return AdjustedTrainFrame,testingFrame,Train_Imputed,Test_Imputed
 
-    def preproc_tadpole_D3(self,Tadpole_D3,usePreProc=1):
-        preproc_tadpole_D1_D2_RSCRIPT = ""
-        #Tadpole_D1_D2.to_csv("data/temp/train_df.csv")        
-        with open('R_scripts/preproc_tadpole_D1_D2.txt', 'r') as file: 
-            preproc_tadpole_D1_D2_RSCRIPT = file.read()
-        #replace the values on the script with the actual atributes needed (its like pasing arguments in a function)   
-        preproc_tadpole_D1_D2_RSCRIPT = preproc_tadpole_D1_D2_RSCRIPT.replace("_preTrain_",str(usePreProc))
+    def preproc_tadpole_D3(self,Tadpole_D3,usePreProc=True):
+        #using the usePreProc flag you can select between use the preprocess model results or not
+        if usePreProc == False :
+            preproc_tadpole_D3_RSCRIPT = ""
+            Tadpole_D3.to_csv("data/TADPOLE_D3.csv")        
+            with open('R_scripts/preproc_tadpole_D3.r', 'r') as file: 
+                preproc_tadpole_D3_RSCRIPT = file.read()
+            #replace the values on the script with the actual atributes needed (its like pasing arguments in a function)   
+            #preproc_tadpole_D3_RSCRIPT = preproc_tadpole_D3_RSCRIPT.replace("_preTrain_",str(usePreProc))
+            preproc_tadpole_D3_RFUNC = robjects.r(preproc_tadpole_D3_RSCRIPT)
+            #load the result of preprocesing of Tadpole_D3
 
-        preproc_tadpole_D1_D2_RFUNC = robjects.r(preproc_tadpole_D1_D2_RSCRIPT)
-        #load the result of preprocesing of Tadpole_d1_d2
-        AdjustedTrainFrame = pd.read_csv("data/temp/dataTadpole$AdjustedTrainFrame.csv")
-        testingFrame = pd.read_csv("data/temp/dataTadpole$testingFrame.csv")
-        Train_Imputed = pd.read_csv("data/temp/dataTadpole$Train_Imputed.csv")
-        Test_Imputed = pd.read_csv("data/temp/dataTadpole$Test_Imputed.csv")
+        AdjustedTrainFrame = pd.read_csv("data/temp/dataTadpoleD3$AdjustedTrainFrame.csv")
+        testingFrame = pd.read_csv("data/temp/dataTadpoleD3$testingFrame.csv")
+        Train_Imputed = pd.read_csv("data/temp/dataTadpoleD3$Train_Imputed.csv")
+        Test_Imputed = pd.read_csv("data/temp/dataTadpoleD3$Test_Imputed.csv")
 
         return AdjustedTrainFrame,testingFrame,Train_Imputed,Test_Imputed
 
-    def Forecast_D2(self,AdjustedTrainFrame,testingFrame):
-        Forecast_D2_RSCRIPT = ""
-        #Tadpole_D1_D2.to_csv("data/temp/train_df.csv")        
-        with open('R_scripts/Forecast_D2.r', 'r') as file: 
-            Forecast_D2_RSCRIPT = file.read()
 
-        Forecast_D2_RFUNC = robjects.r(Forecast_D2_RSCRIPT)
+
+    def Forecast_D2(self,AdjustedTrainFrame,testingFrame,Train_Imputed,Test_Imputed,usePreProc=True):
+        if usePreProc == False :
+            Forecast_D2_RSCRIPT = ""
+            #Tadpole_D1_D2.to_csv("data/temp/train_df.csv")        
+            with open('R_scripts/Forecast_D2.r', 'r') as file: 
+                Forecast_D2_RSCRIPT = file.read()
+            Forecast_D2_RFUNC = robjects.r(Forecast_D2_RSCRIPT)
         ForecastD2_BORREGOS_TEC = pd.read_csv("data/temp/_ForecastD2_BORREGOS_TEC.csv")
         return ForecastD2_BORREGOS_TEC
 
-    def Forecast_D3(self):
-        Forecast_D3_RSCRIPT = ""
-        with open('R_scripts/Preproc_Forecast_D3.r', 'r') as file: 
-            Forecast_D3_RSCRIPT = file.read()
-            
-        Forecast_D3_RFUNC = robjects.r(Forecast_D3_RSCRIPT)
-        #ForecastD2_BORREGOS_TEC = pd.read_csv("data/temp/_ForecastD2_BORREGOS_TEC.csv")
-        return "ForecastD3_BORREGOS_TEC"
-
+    def Forecast_D3(self,AdjustedTrainFrame,testingFrame,Train_Imputed,Test_Imputed,usePreProc=True):
+        if usePreProc == False :
+            Forecast_D3_RSCRIPT = ""
+            with open('R_scripts/Preproc_Forecast_D3.r', 'r') as file: 
+                Forecast_D3_RSCRIPT = file.read()       
+            Forecast_D3_RFUNC = robjects.r(Forecast_D3_RSCRIPT)
+        ForecastD3_BORREGOS_TEC = pd.read_csv("data/temp/_ForecastD3_BORREGOS_TEC.csv")
+        return ForecastD3_BORREGOS_TEC
+###############################################
     def preprocess_df_R(self,dataframe):
         #this function parse a python dataframe to a R dataframe
         feature_dict = {}

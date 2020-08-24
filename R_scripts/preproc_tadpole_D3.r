@@ -28,4 +28,9 @@ D3TrainingSet <- TrainingSet[!(TrainingSet$RID %in% D3IDS),]
                                                            colImputeThreshold=0.15,
                                                            rowImputeThreshold=0.10,
                                                            includeID=FALSE))
-  save(dataTadpoleD3,file="data/temp/D3DataFrames.RDATA")
+  #save(dataTadpoleD3,file="data/temp/D3DataFrames.RDATA")
+  write.csv(dataTadpoleD3$AdjustedTrainFrame,"data/temp/dataTadpoleD3$AdjustedTrainFrame.csv")
+  write.csv(dataTadpoleD3$testingFrame,"data/temp/dataTadpoleD3$testingFrame.csv")
+  write.csv(dataTadpoleD3$Train_Imputed,"data/temp/dataTadpoleD3$Train_Imputed.csv")
+  write.csv(dataTadpoleD3$Test_Imputed,"data/temp/dataTadpoleD3$Test_Imputed.csv")
+  

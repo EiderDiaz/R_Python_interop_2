@@ -1,0 +1,8 @@
+*.egg-info
+__pychache__
+*.pyc
+.ipynb_checkpoints
+.idea
+#ignore the data folder
+data/*
+*/data/*

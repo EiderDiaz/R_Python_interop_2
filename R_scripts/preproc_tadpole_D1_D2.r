@@ -1,9 +1,4 @@
-##ARGS
-preTrain = _preTrain_
-###
 
-
-print(preTrain)
 
 #TRAIN SETS of spliting is in the preprocess func
 suppressMessages(library("FRESA.CAD"))
@@ -30,7 +25,7 @@ suppressMessages(library("FRESA.CAD"))
   
   
   
-      dataTadpole <- suppressMessages(dataTADPOLEPreprocesing(TrainingSet,
+    dataTadpole <- suppressMessages(dataTADPOLEPreprocesing(TrainingSet,
                                              D2TesingSet,
                                              TADPOLE_D1_D2_Dict,
                                              MinVisit=36,
