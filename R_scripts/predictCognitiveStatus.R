@@ -7,8 +7,12 @@
 #' @export
 #'
 #' @examples
-forecastCognitiveStatus <- function(Models,TestDataFrame)
-{
+forecastCognitiveStatus <- function(Models,TestDataFrame){
+  
+  #args
+  Models=CognitiveClassModels
+  TestDataFrame = testingFrame
+  ###
   predictors <- Models$predictors
   months <- as.numeric(names(table(TestDataFrame$M)))
   print(months)
@@ -19,8 +23,7 @@ forecastCognitiveStatus <- function(Models,TestDataFrame)
   
   TestDataFrame$RID <- as.character(TestDataFrame$RID)
   library("FRESA.CAD")
-  if (is.null(months))
-  {
+  if (is.null(months)){
     months <- as.numeric(names(table(TestDataFrame$M)))
     print(months)
   }
@@ -50,10 +53,8 @@ forecastCognitiveStatus <- function(Models,TestDataFrame)
   names(lastDX) <- BaseTimepointSet$RID
   print(sum(is.na(TestDataFrame$M)))
 #  totR <- 0
-  if (length(months) > 1)
-  {
-    for (m in months)
-    {
+  if (length(months) > 1){
+    for (m in months){
       TimePointsSubset[[i]] <- subset(TestDataFrame,M == m)
       rownames(TimePointsSubset[[i]]) <- TimePointsSubset[[i]]$RID
       TimePointsSubset[[i]]$Year_bl_LastVisit <- lastTimepointSet[TimePointsSubset[[i]]$RID,"Years_bl"]
@@ -73,9 +74,7 @@ forecastCognitiveStatus <- function(Models,TestDataFrame)
     TestDataFrame <- Orderbytimepoint
     Orderbytimepoint <- NULL
     print(nrow(TestDataFrame))
-  }
-  else
-  {
+  }else{
     TestDataFrame <- lastTimepointSet
     TestDataFrame$M <- numeric(nrow(TestDataFrame))
     TestDataFrame$Year_bl_LastVisit <- numeric(nrow(TestDataFrame))
@@ -90,32 +89,22 @@ forecastCognitiveStatus <- function(Models,TestDataFrame)
   
   
   
-  
-  if (is.null(Models$CrossModels[[1]]$oridinalModels))
-  {
+  if (is.null(Models$CrossModels[[1]]$oridinalModels)){
     crossprediction <- predict(Models$CrossModels[[1]],lastTimepointSet)
-  }
-  else
-  {
+  }else{
     crossprediction <- predict(Models$CrossModels[[1]]$oridinalModels,lastTimepointSet)
   }
-  for (n in 2:length(Models$CrossModels))
-  {
-    if (is.null(Models$CrossModels[[n]]$oridinalModels))
-    {
+  for (n in 2:length(Models$CrossModels)){
+    if (is.null(Models$CrossModels[[n]]$oridinalModels)){
       crossprediction <- crossprediction + predict(Models$CrossModels[[n]],lastTimepointSet)
-    }
-    else
-    {
+    } else {
       crossprediction <- crossprediction + predict(Models$CrossModels[[n]]$oridinalModels,lastTimepointSet)
     }
   }
-  if (is.null(Models$CrossModels[[1]]$oridinalModels))
-  {
+  
+  if (is.null(Models$CrossModels[[1]]$oridinalModels)){
     crossprediction <- as.integer(crossprediction/length(Models$CrossModels)+0.5)
-  }
-  else
-  {
+  } else  {
     crossprediction <- as.data.frame(crossprediction[,(ncol(crossprediction)-2):ncol(crossprediction)]/length(Models$CrossModels))
     rownames(crossprediction) <- lastTimepointSet$RID
   }
@@ -151,8 +140,7 @@ forecastCognitiveStatus <- function(Models,TestDataFrame)
   NCMCIAUC <- sm$tAUC
   
   
-  for (n in 2:length(Models$MCIToADModels))
-  {
+  for (n in 2:length(Models$MCIToADModels)){
     MCITOADprediction <- MCITOADprediction + predict(Models$MCIToADModels[[n]],lastTimepointSet)
     MCITOADTimeprediction <- MCITOADTimeprediction + predict(Models$MCIToADTimeModel[[n]],lastTimepointSet)
     sm <- summary(Models$MCIToADModels[[n]])
