@@ -54,17 +54,6 @@ class BenchmarkSVM_R(TadpoleModel):
         return r_from_pd_df
 
 
-    def tadpole_tidyng(self,path_tadpole,path_varnames):
-        tadpole_tidying_script = ""
-        with open('R_scripts/tadpole_tidying.txt', 'r') as file:
-        #this file contains the BSWIMS function 
-            tadpole_tidying_script = file.read()
-        #replace the values on the script with the actual atributes needed    
-        tadpole_tidying_script = tadpole_tidying_script.replace("tadpole_path",path_tadpole)
-        tadpole_tidying_script = tadpole_tidying_script.replace("varnames_path",path_varnames)
-        tidy_dataframe = robjects.r(tadpole_tidying_script)  
-        return tidy_dataframe
-
 ##################################### final functions   
     def preproc_tadpole_D1_D2(self,Tadpole_D1_D2,usePreProc=True):
         #using the usePreProc flag you can select between use the preprocess model results or not
@@ -116,59 +105,35 @@ class BenchmarkSVM_R(TadpoleModel):
         ForecastD2_BORREGOS_TEC = pd.read_csv("data/temp/_ForecastD2_BORREGOS_TEC.csv")
         return ForecastD2_BORREGOS_TEC
 
+
+    def Forecast_D2_HLCM_EM(self,AdjustedTrainFrame,testingFrame,Train_Imputed,Test_Imputed,usePreProc=True):
+        if usePreProc == False :
+            Forecast_D2_RSCRIPT = ""
+            #Tadpole_D1_D2.to_csv("data/temp/train_df.csv")        
+            with open('R_scripts/Forecast_D2_HLCM_EM.R', 'r') as file: 
+                Forecast_D2_RSCRIPT = file.read()
+            Forecast_D2_RFUNC = robjects.r(Forecast_D2_RSCRIPT)
+        ForecastD2_BORREGOS_TEC = pd.read_csv("data/temp/HLCM_EM_ForecastD2_BORREGOS_TEC.csv")
+        return ForecastD2_BORREGOS_TEC
+
     def Forecast_D3(self,AdjustedTrainFrame,testingFrame,Train_Imputed,Test_Imputed,usePreProc=True):
         if usePreProc == False :
             Forecast_D3_RSCRIPT = ""
-            with open('R_scripts/Preproc_Forecast_D3.r', 'r') as file: 
+            with open('R_scripts/Forecast_D3.r', 'r') as file: 
                 Forecast_D3_RSCRIPT = file.read()       
             Forecast_D3_RFUNC = robjects.r(Forecast_D3_RSCRIPT)
         ForecastD3_BORREGOS_TEC = pd.read_csv("data/temp/_ForecastD3_BORREGOS_TEC.csv")
         return ForecastD3_BORREGOS_TEC
+
+    def Forecast_D3_HLCM_EM(self,AdjustedTrainFrame,testingFrame,Train_Imputed,Test_Imputed,usePreProc=True):
+        if usePreProc == False :
+            Forecast_D3_RSCRIPT = ""
+            with open('R_scripts/Forecast_D3_HLCM_EM.R', 'r') as file: 
+                Forecast_D3_RSCRIPT = file.read()       
+            Forecast_D3_RFUNC = robjects.r(Forecast_D3_RSCRIPT)
+        ForecastD3_BORREGOS_TEC = pd.read_csv("data/temp/HLCM_EM_ForecastD3_BORREGOS_TEC.csv")
+        return ForecastD3_BORREGOS_TEC
 ###############################################
-    def preprocess_df_R(self,dataframe):
-        #this function parse a python dataframe to a R dataframe
-        feature_dict = {}
-        for colname in dataframe.columns:
-            # What happens if we pass the wrong type?
-            feature_dict[colname] = robjects.FloatVector(dataframe[colname])
-        dataframe_R = robjects.DataFrame(feature_dict)
-        return dataframe_R
-        
-        
-   
-    def modelfitting_R(self, model,formula,dataframe):
-        formula_R = robjects.Formula(formula) 
-        r_model = robjects.r[model]
-        model =  r_model(formula=formula_R, data=dataframe)
-
-        return model
-
-    def predict_R(self,model,test_df):
-        r_predict = robjects.r["predict"]
-        predictions = r_predict(model, test_df)
-        return predictions
-
-    def SVM_fitting_R(self,formula,dataframe):
-        e1071 = importr('e1071')
-        r_svm = robjects.r["svm"]
-        #r_false = robjects.r["FALSE"]
-        formula_R = robjects.Formula(formula) 
-        model = r_svm(formula=formula_R, data=dataframe, kernel = "linear", cost = 10, scale = 0)
-        return model
-
-#############caret
-    def caret_gmb_modelfitting_R(self):
-            caret_modelfitting = ""
-            with open('R_scripts/caret_gmb.txt', 'r') as file:
-            #this file contains magic R scrpits 
-                caret_modelfitting = file.read()
-            caret_modelfitting = caret_modelfitting.replace("tadpole_path",path_tadpole)
-            tadpole_tidying_script = tadpole_tidying_script.replace("varnames_path",path_varnames)
-            caret_model = robjects.r(caret_gmb_modelfitting)
-            return gmb_model
-
-
-
 
 #end R functions
     def preprocess(self, path_d1="data/TADPOLE_D1_D2.csv",
@@ -186,34 +151,6 @@ class BenchmarkSVM_R(TadpoleModel):
 
     def train(self, train_df):
         return super().train(train_df)
-
-    def train_caret_classifier(self,theoutcome, model,df=""):
-        train_df_R = df
-        if not df:
-            train_df_R = self.preprocess()     
-        caret_modelfitting = ""
-        with open('R_scripts/caret_classifier.txt', 'r') as file:
-            #this file contains magic R scrpits 
-            caret_modelfitting = file.read()
-            caret_model_function = robjects.r(caret_modelfitting)
-            caret_model = caret_model_function(theoutcome=theoutcome,model=model,train_df=train_df_R)
-            return caret_model
-
-    def train_caret_regression(self,theoutcome, model,df=""):
-        train_df_R = df
-        if not df:
-            train_df_R = self.preprocess()     
-        caret_modelfitting = ""
-        with open('R_scripts/caret_regression.txt', 'r') as file:
-            #this file contains magic R scrpits 
-            caret_modelfitting = file.read()
-            caret_model_function = robjects.r(caret_modelfitting)
-            caret_model = caret_model_function(theoutcome,model,train_df_R)
-            return caret_model
-
-        
-
-       
 
     def predict(self, test_df):
         logger.info("Predicting")
